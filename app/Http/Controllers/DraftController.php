@@ -19,6 +19,25 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class DraftController extends Controller
 {
 
+    // detele draft
+    public function DeleteDrafts($id)
+    {
+        try {
+        $sections = section::where('draft_id', $id)->delete();
+        $draft = draft::where('id', $id)->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Drafts deleted successfully'
+        ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting drafts',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     private function deleteDirectory($dir)
     {
         // Check if the directory exists

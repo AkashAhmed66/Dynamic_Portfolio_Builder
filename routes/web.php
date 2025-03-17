@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/go-to-cv/{cvId}/{draftId}', [DraftController::class, 'GoToCv'])->name('GoToCv');
     Route::post('/save-draft', [DraftController::class, 'SaveDraft'])->name('saveDraft');
     Route::get('/get-drafts', [DraftController::class, 'GetDrafts'])->name('GetDrafts');
+    Route::delete('/delete-draft/{id}', [DraftController::class, 'DeleteDrafts'])->name('DeleteDrafts');
     Route::post('/generate-pdf', [DraftController::class, 'generatePdf']);
     Route::post('/generate-pdf-preview', [DraftController::class, 'generatePdfPreview']);
 });

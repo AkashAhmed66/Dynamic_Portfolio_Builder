@@ -17,6 +17,7 @@ export default function Dashboard() {
     const timeoutRef = useRef(null);
     const [pdfUrl, setPdfUrl] = useState(null);
     const [finalLatexCode, setLatexCode] = useState('');
+    const [building, setBuilding] = useState(false);
 
     useEffect(() => {
         setDraftName(draft?.name || '');
@@ -144,7 +145,6 @@ export default function Dashboard() {
         return header + sectionsLatex + footer;
     };
     
-    
 
     const handleGeneratePDF = () => {
         const latexCode = generateLaTeXCode();
@@ -167,6 +167,7 @@ export default function Dashboard() {
     };
     const previewPdf = () => {
         const latexCode = generateLaTeXCode();
+        setBuilding(true);
         setTimeout(() => {
             axios.post('/generate-pdf-preview', { latex: latexCode })
                 .then(response => {
@@ -177,11 +178,14 @@ export default function Dashboard() {
                         setPdfUrl(fullUrl);
                     } else {
                         throw new Error('Invalid response: No PDF path returned');
+                        setBuilding(false);
                     }
+                    setBuilding(false);
                 })
                 .catch(error => {
                     console.error('PDF generation failed:', error);
                     alert('PDF generation failed. Please check your LaTeX syntax.');
+                    setBuilding(false);
                 });
         }, 2000);
     };
@@ -320,15 +324,33 @@ export default function Dashboard() {
                 </div>
 
                 {/* Right Panel - LaTeX Preview */}
-                <div className="w-1/2 p-6 bg-gray-100 overflow-y-auto">
-                {pdfUrl ? (
-                    <embed src={pdfUrl} type="application/pdf" className="w-full h-full border rounded-lg shadow-lg"></embed>
-                    // <iframe src={pdfUrl} className="w-full h-full border rounded-lg shadow-lg"></iframe>
+                <div className="w-1/2 p-6 bg-gray-100 overflow-y-auto flex justify-center items-center">
+                {building ? (
+                    <div className="flex flex-col items-center justify-center p-8 rounded shadow-lg bg-gray-100">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-blue-500 border-solid mb-4"></div>
+                    <p className="text-lg font-semibold text-gray-700">Building PDF...</p>
+                    <p className="text-sm text-gray-500 mt-2">This may take a moment.</p>
+                    </div>
+                ) : pdfUrl ? (
+                    <embed src={pdfUrl} type="application/pdf" className="w-full h-full border rounded-lg shadow-lg" />
                 ) : (
-                    <div 
-                        className="p-6 rounded shadow-lg"
+                    <div className="flex flex-col items-center justify-center p-8 rounded shadow-lg bg-gray-100">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-12 w-12 text-gray-400 mb-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
                     >
-                        Click Preview PDF to see changes... 
+                        <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L4 8m4-4v12"
+                        />
+                    </svg>
+                    <p className="text-lg font-semibold text-gray-700">Click Preview PDF</p>
+                    <p className="text-sm text-gray-500">to see changes...</p>
                     </div>
                 )}
                 </div>
